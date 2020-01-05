@@ -95,7 +95,7 @@ class Network:
         return info
 
     def get_image(self, path, name):
-        base_url = 'https://image.tmdb.org/t/p/w92' + path
+        base_url = 'https://image.tmdb.org/t/p/w154' + path
         r = requests.get(base_url)
         with open('./media/poster/' + name + '.jpg', 'wb') as f:
             f.write(r.content)
@@ -126,8 +126,8 @@ class Network:
                 else:
                     files_list.remove(values['location'])
 
-            print(json.dumps(db, indent=2))
-            print(files_list)
+            # print(json.dumps(db, indent=2))
+            # print(files_list)
             self.database = db
 
         except:
@@ -135,7 +135,7 @@ class Network:
 
         for filename in files_list:
             name = re.match(r'^.*\\(.*?)\s+\(.*?$', filename).group(1)
-            print(name)
+            # print(name)
             info = self.search_movie(name)
 
             # Get poster for the movie

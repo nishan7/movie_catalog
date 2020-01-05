@@ -115,8 +115,9 @@ class FlowLayout(QtWidgets.QLayout):
 
 
 class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, parent=None, db):
+    def __init__(self, db, parent=None, ):
         super().__init__()
+        self.db = db
         self.initUI(self)
 
         # root = tkinter.Tk()
@@ -127,7 +128,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def initUI(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         # MainWindow.resize(self.width*.9, self.height*.9)
-
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
@@ -185,6 +185,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
 
         # Movie Area
         self.movie_area = QtWidgets.QScrollArea(self.centralwidget)
@@ -299,16 +304,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.year.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignTop | QtCore.Qt.AlignTrailing)
         self.year.setObjectName("year")
         self.horizontalLayout_3.addWidget(self.year)
-        self.yearValue = QtWidgets.QLabel(self.scrollAreaWidgetContents_2)
+        self.year_value = QtWidgets.QLabel(self.scrollAreaWidgetContents_2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.yearValue.sizePolicy().hasHeightForWidth())
-        self.yearValue.setSizePolicy(sizePolicy)
-        self.yearValue.setMaximumSize(QtCore.QSize(16777215, 15))
-        self.yearValue.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
-        self.yearValue.setObjectName("yearValue")
-        self.horizontalLayout_3.addWidget(self.yearValue)
+        sizePolicy.setHeightForWidth(self.year_value.sizePolicy().hasHeightForWidth())
+        self.year_value.setSizePolicy(sizePolicy)
+        self.year_value.setMaximumSize(QtCore.QSize(16777215, 15))
+        self.year_value.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
+        self.year_value.setObjectName("yearValue")
+        self.horizontalLayout_3.addWidget(self.year_value)
         self.verticalLayout_4.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
@@ -476,9 +481,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+
+
+
+
         self.actionSetting = QtWidgets.QAction(MainWindow)
         self.actionSetting.setObjectName("actionSetting")
         self.actionAbout = QtWidgets.QAction(MainWindow)
@@ -488,7 +494,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar.addAction(self.menuFile.menuAction())
 
         for b in self.buttons:
-            b.clicked.connect(self.action)
+            b.clicked.connect(self.update_movie_info)
 
         self.retranslateUi(MainWindow)
         # self.pushButton_3.clicked.connect(self.info_area.repaint)
@@ -496,14 +502,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sort_combo_box.currentIndexChanged['QString'].connect(self.movie_area.repaint)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def action(self):
-        sender = self.sender()
-        print(sender.objectName())
+    # def action(self):
+    #     sender = self.sender()
+    #     print(sender.objectName())
 
         ## Get movie info
         ## Update the movie info and repaint
 
-    def update_movie_info
+
+
+    def update_movie_info(self, movie_name):
+        movie_name = self.sender.objectName()
+
+        self.rating_value.setText(self.db.database[movie_name]['vote_average'])
+        self.year_value.setText(self.db.database[movie_name]['release_date'])
+        self.runtime_value.setText(self.db.database[movie_name]['runtime'])
+        # self.director_value.setText(self.db.database[movie_name][''])
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -518,7 +533,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.title_value.setText(_translate("MainWindow", "TextLabel"))
         self.tagline.setText(_translate("MainWindow", "dsjfklsadfkjfsdlfjs lfsad"))
         self.year.setText(_translate("MainWindow", "Year"))
-        self.yearValue.setText(_translate("MainWindow", "TextLabel"))
+        self.year_value.setText(_translate("MainWindow", "TextLabel"))
         self.director.setText(_translate("MainWindow", "Director"))
         self.director_value.setText(_translate("MainWindow", "TextLabel"))
         self.genre.setText(_translate("MainWindow", "Genre"))
@@ -536,23 +551,32 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout.setText(_translate("MainWindow", "About"))
 
     def add_buttons(self):
+        # Get the names of all the movie from database json
+        movie_lst = self.db.database.keys()
+        # print(movie_lst)
+        #
         s = QtCore.QSize(154, 240)
-        icon = QtGui.QIcon()
-        self.buttons=[]
 
-        for i in range(200):
+        self.buttons = []
+
+        for movie in movie_lst:
             # b = QtWidgets.QLabel()
             b = QtWidgets.QToolButton()
-            b.setText("Button" + str(i))
-            b.setObjectName("Button" + str(i))
-            icon.addPixmap(QtGui.QPixmap("A Beautiful Mind.jpg"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            b.setText(movie)
+            b.setObjectName(movie)
+            path ='./media/poster/' + movie + '.jpg'
+            print(movie, path)
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             b.setIcon(icon)
             b.setAutoRaise(True)
+            b.setStyleSheet('''text-align:left;''')
             b.setIconSize(QtCore.QSize(154, 210))
             b.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
             b.setFixedSize(s)
             self.flow_layout.addWidget(b)
             self.buttons.append(b)
+            self.statusbar.showMessage(str(len(movie_lst))+ " movies loaded")
 
 
 
@@ -560,6 +584,7 @@ if __name__ == '__main__':
     import sys
 
     db = database.Network("A:\\!Movie")
+    db.start()
 
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow(db)
