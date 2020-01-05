@@ -186,7 +186,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_2.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
-
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
@@ -368,6 +367,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.director_value.sizePolicy().hasHeightForWidth())
         self.director_value.setSizePolicy(sizePolicy)
+        self.director_value.setWordWrap(True)
         self.director_value.setMaximumSize(QtCore.QSize(16777215, 15))
         self.director_value.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.director_value.setObjectName("director_value")
@@ -482,9 +482,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
 
-
-
-
         self.actionSetting = QtWidgets.QAction(MainWindow)
         self.actionSetting.setObjectName("actionSetting")
         self.actionAbout = QtWidgets.QAction(MainWindow)
@@ -502,23 +499,55 @@ class MainWindow(QtWidgets.QMainWindow):
         self.sort_combo_box.currentIndexChanged['QString'].connect(self.movie_area.repaint)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    # def action(self):
-    #     sender = self.sender()
-    #     print(sender.objectName())
+    def action(self):
+        sender = self.sender()
+        print(sender.objectName())
+        self.year_value.setText('2009-07-17')
+        # self.runtime_value.setText(self.db.database[movie_name]['runtime'])
+        # self.director_value.setText(self.db.database[movie_name][''])
+        self.info_area.repaint()
 
         ## Get movie info
         ## Update the movie info and repaint
 
+    def concat(self, lst):
+        string=''
+        for item in lst:
+            string = string+' '+string
+        return string
 
+    def update_movie_info(self):
+        # sender = self.sender()
+        # print(sender.objectName())
+        # self.year_value.setText('sddsf')
 
-    def update_movie_info(self, movie_name):
-        movie_name = self.sender.objectName()
-
-        self.rating_value.setText(self.db.database[movie_name]['vote_average'])
+        movie_name = self.sender().objectName()
+        print(movie_name)
+        temp = self.db.database[movie_name]['release_date']
+        print(temp)
+        # self.year_value.setText('sddsf')
+        #
+        self.rating_value.setText(str(self.db.database[movie_name]['vote_average']))
         self.year_value.setText(self.db.database[movie_name]['release_date'])
-        self.runtime_value.setText(self.db.database[movie_name]['runtime'])
-        # self.director_value.setText(self.db.database[movie_name][''])
+        self.tagline.setText(self.db.database[movie_name]['tagline'])
+        self.title_value.setText(self.db.database[movie_name]['title'])
+        self.plot_value.setText(self.db.database[movie_name]['overview'])
 
+        self.poster_value.setPixmap(QtGui.QPixmap('./media/poster/' + movie_name + '.jpg'))
+        self.runtime_value.setText(str(self.db.database[movie_name]['runtime'])+' minutes')
+
+
+        cast_dict =self.db.database[movie_name]['cast']
+        cast = ", ".join([actor for actor in cast_dict.keys()])
+        self.cast_value.setText(cast)
+
+        self.director_value.setText(", ".join(director for director in self.db.database[movie_name]['director']))
+
+
+
+        # self.cast_value.setText()
+        # self.director_value.setText(self.db.database[movie_name][''])
+        self.info_area.repaint()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -550,9 +579,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionSetting.setText(_translate("MainWindow", "Setting"))
         self.actionAbout.setText(_translate("MainWindow", "About"))
 
-    def add_buttons(self):
+    def add_buttons(self, order=''):
         # Get the names of all the movie from database json
         movie_lst = self.db.database.keys()
+        if order=='':
+            pass
+        elif order=='asc':
+            movie_lst.sort()
+        elif order == 'desc':
+            movie_lst.sort(reverse=True)
+
         # print(movie_lst)
         #
         s = QtCore.QSize(154, 240)
@@ -564,7 +600,7 @@ class MainWindow(QtWidgets.QMainWindow):
             b = QtWidgets.QToolButton()
             b.setText(movie)
             b.setObjectName(movie)
-            path ='./media/poster/' + movie + '.jpg'
+            path = './media/poster/' + movie + '.jpg'
             print(movie, path)
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap(path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -576,8 +612,7 @@ class MainWindow(QtWidgets.QMainWindow):
             b.setFixedSize(s)
             self.flow_layout.addWidget(b)
             self.buttons.append(b)
-            self.statusbar.showMessage(str(len(movie_lst))+ " movies loaded")
-
+            self.statusbar.showMessage(str(len(movie_lst)) + " movies loaded")
 
 
 if __name__ == '__main__':
