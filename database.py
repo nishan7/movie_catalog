@@ -14,6 +14,7 @@ class Network:
                'Connection': 'close'}
     BASE_PATH = 'https://api.themoviedb.org/3/'
     database = dict()
+    dir = ''
 
     def __init__(self, dir):
         self.API_KEY = '695405dd49c500e659c471af7f59c9b5'
@@ -64,7 +65,6 @@ class Network:
         # print(json.dumps(temp, indent=4))
         return temp
 
-
     def movie_details(self, id):
         base_path = self.BASE_PATH + "movie/" + str(id) + "?"
 
@@ -92,13 +92,12 @@ class Network:
         del info['credits']
         info.update(credits)
 
-
         return info
 
     def get_image(self, path, name):
-        base_url = 'https://image.tmdb.org/t/p/w92'+path
+        base_url = 'https://image.tmdb.org/t/p/w92' + path
         r = requests.get(base_url)
-        with open('./media/poster/'+path, 'wb') as f:
+        with open('./media/poster/' + name + '.jpg', 'wb') as f:
             f.write(r.content)
 
     def files(self):
