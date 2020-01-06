@@ -94,10 +94,15 @@ class Network:
 
         return info
 
-    def get_image(self, path, name):
-        base_url = 'https://image.tmdb.org/t/p/w154' + path
-        r = requests.get(base_url)
+    def get_image(self, poster_path,backdrop_path, name):
+        poster_url = 'https://image.tmdb.org/t/p/w154' + poster_path
+        r = requests.get(poster_url)
         with open('./media/poster/' + name + '.jpg', 'wb') as f:
+            f.write(r.content)
+
+        backdrop_url = 'https://image.tmdb.org/t/p/w780' + backdrop_path
+        r = requests.get(backdrop_url)
+        with open('./media/backdrop/' + name + '.jpg', 'wb') as f:
             f.write(r.content)
 
     def files(self):
@@ -139,7 +144,7 @@ class Network:
             info = self.search_movie(name)
 
             # Get poster for the movie
-            self.get_image(info["poster_path"], name)
+            self.get_image(info["poster_path"],info['backdrop_path'], name)
             info['location'] = filename
 
             self.database[name] = info
