@@ -4,10 +4,16 @@
 #
 # Created by: PyQt5 UI code generator 5.13.2
 #
+
+## TODO add info dialog add to ui
+## TODO add setting dialog and add to ui
+## TODO try having intitalization screen
+## TODO context menu and link to google search
+## TODO other sorts and  searching
 import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLabel, QDialog, QAction
 
 import database
 
@@ -117,9 +123,11 @@ class FlowLayout(QtWidgets.QLayout):
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    actionAbout1: QAction
     poster_value: QLabel
+    movie_list =[]
 
-    def __init__(self, db, parent=None, ):
+    def __init__(self, db, parent=None ):
         super().__init__()
         self.db = db
         self.initUI(self)
@@ -128,6 +136,30 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.width = root.winfo_screenwidth()
         # self.height = root.winfo_screenheight()
         # print(self.width, self.height);
+
+    def setting_window(self):
+        # If you pass a parent (self) will block the Main Window,
+        # and if you do not pass both will be independent,
+        # I recommend you try both cases.
+        widget = QDialog(self)
+        from setting import Ui_Setting
+        ui=Ui_Setting()
+        ui.path = self.db.path
+        ui.setupUi(widget)
+        widget.exec_()
+
+    def info_window(self):
+        # If you pass a parent (self) will block the Main Window,
+        # and if you do not pass both will be independent,
+        # I recommend you try both cases.
+        widget = QDialog(self)
+        from info import Ui_info
+        ui=Ui_info()
+
+        ui.setupUi(widget)
+        widget.exec_()
+
+
 
     def initUI(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -149,7 +181,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.navbar_horizontal_layout = QtWidgets.QHBoxLayout()
         self.navbar_horizontal_layout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         self.navbar_horizontal_layout.setObjectName("navbar_horizontal_layout")
-        self.search_field = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.search_field = QtWidgets.QLineEdit(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -157,9 +189,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.search_field.setSizePolicy(sizePolicy)
         self.search_field.setMinimumSize(QtCore.QSize(0, 10))
         self.search_field.setMaximumSize(QtCore.QSize(185, 30))
-        self.search_field.setToolTip("")
-        self.search_field.setPlainText("")
-        self.search_field.setPlaceholderText("")
+        self.search_field.setToolTip("Search for movies")
+        # self.search_field.setText("Search..")
+        # self.search_field.setPlaceholderText("Search..")
         self.search_field.setObjectName("search_field")
         self.navbar_horizontal_layout.addWidget(self.search_field)
         self.search_button = QtWidgets.QPushButton(self.centralwidget)
@@ -227,7 +259,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Adding Buttons in FlowLayout
         self.flow_layout = FlowLayout(self.scrollAreaWidgetContents, hspacing=15, vspacing=10)
 
-        self.add_buttons()
+        lst = list(self.db.database.keys())
+        lst.sort()
+        self.add_buttons(lst)
 
         self.movie_area.setWidget(self.scrollAreaWidgetContents)
         self.main_area_horizontal_layout.addWidget(self.movie_area)
@@ -342,7 +376,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.year.sizePolicy().hasHeightForWidth())
         self.year.setSizePolicy(sizePolicy)
-        self.year.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.year.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -357,7 +391,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.year_value.sizePolicy().hasHeightForWidth())
         self.year_value.setSizePolicy(sizePolicy)
-        self.year_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.year_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.year_value.setFont(font)
@@ -378,7 +412,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.rating.sizePolicy().hasHeightForWidth())
         self.rating.setSizePolicy(sizePolicy)
-        self.rating.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.rating.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -393,7 +427,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.rating_value.sizePolicy().hasHeightForWidth())
         self.rating_value.setSizePolicy(sizePolicy)
-        self.rating_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.rating_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.rating_value.setFont(font)
@@ -412,7 +446,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.director.sizePolicy().hasHeightForWidth())
         self.director.setSizePolicy(sizePolicy)
-        self.director.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.director.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -428,7 +462,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.director_value.sizePolicy().hasHeightForWidth())
         self.director_value.setSizePolicy(sizePolicy)
-        self.director_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.director_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.director_value.setFont(font)
@@ -447,7 +481,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.runtime.sizePolicy().hasHeightForWidth())
         self.runtime.setSizePolicy(sizePolicy)
-        self.runtime.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.runtime.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -462,7 +496,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.runtime_value.sizePolicy().hasHeightForWidth())
         self.runtime_value.setSizePolicy(sizePolicy)
-        self.runtime_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.runtime_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.runtime_value.setFont(font)
@@ -482,7 +516,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setHeightForWidth(self.genre.sizePolicy().hasHeightForWidth())
         self.genre.setSizePolicy(sizePolicy)
         self.genre.setWordWrap(True)
-        self.genre.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.genre.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -497,7 +531,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.genre_value.sizePolicy().hasHeightForWidth())
         self.genre_value.setSizePolicy(sizePolicy)
-        self.genre_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.genre_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.genre_value.setFont(font)
@@ -516,7 +550,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.budget.sizePolicy().hasHeightForWidth())
         self.budget.setSizePolicy(sizePolicy)
-        self.budget.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.budget.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -531,7 +565,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.budget_value.sizePolicy().hasHeightForWidth())
         self.budget_value.setSizePolicy(sizePolicy)
-        self.budget_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.budget_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.budget_value.setFont(font)
@@ -550,7 +584,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.box_office.sizePolicy().hasHeightForWidth())
         self.box_office.setSizePolicy(sizePolicy)
-        self.box_office.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.box_office.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -565,7 +599,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.box_office_value.sizePolicy().hasHeightForWidth())
         self.box_office_value.setSizePolicy(sizePolicy)
-        self.box_office_value.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.box_office_value.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.box_office_value.setFont(font)
@@ -584,7 +618,7 @@ class MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.cast.sizePolicy().hasHeightForWidth())
         self.cast.setSizePolicy(sizePolicy)
-        self.cast.setMaximumSize(QtCore.QSize(16777215, 17))
+        self.cast.setMaximumSize(QtCore.QSize(16777215, 18))
         font = QtGui.QFont()
         font.setPointSize(9)
         font.setBold(True)
@@ -645,36 +679,44 @@ class MainWindow(QtWidgets.QMainWindow):
         MainWindow.setStatusBar(self.statusbar)
         self.actionSetting = QtWidgets.QAction(MainWindow)
         self.actionSetting.setObjectName("actionSetting")
-        self.actionAbout = QtWidgets.QAction(MainWindow)
-        self.actionAbout.setObjectName("actionAbout")
-        self.actionAbout_2 = QtWidgets.QAction(MainWindow)
-        self.actionAbout_2.setObjectName("actionAbout_2")
+        self.actionAbout1 = QtWidgets.QAction(MainWindow)
+        self.actionAbout1.setObjectName("actionAbout1")
+        self.actionExit = QtWidgets.QAction(MainWindow)
+        self.actionExit.setObjectName("actionExit")
         self.menuFile.addAction(self.actionSetting)
-        self.menuHelp.addAction(self.actionAbout_2)
+        self.menuFile.addAction(self.actionExit)
+        self.menuHelp.addAction(self.actionAbout1)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         # self.pushButton_3.clicked.connect(self.info_area.repaint)
-        self.search_button.clicked.connect(self.sort_option_changed)
+        self.search_button.clicked.connect(self.search_option)
+        self.search_field.returnPressed.connect(self.search_option)
+        self.search_field.textChanged.connect(self.search_option)
         self.sort_combo_box.currentIndexChanged['QString'].connect(self.sort_option_changed)
+
         # self.sort_combo_box
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         # self.button_event()
         self.signal_handling()
 
+        self.actionExit.triggered.connect(MainWindow.close)
+        self.actionSetting.triggered.connect(self.setting_window)
+        self.actionAbout1.triggered.connect(self.info_window)
+
         self.update_movie_info(self.buttons[0].objectName())
 
-    def button_event(self):
-        for b in self.buttons:
-            b.clicked.connect(self.update_movie_info)
-            b.doubleClicked.connect(self.open_movie)
-
-    def remove_button_objects(self):
-        for b in self.buttons:
-            del b
-        self.button_event()
+    # def button_event(self):
+    #     for b in self.buttons:
+    #         b.clicked.connect(self.update_movie_info)
+    #         b.doubleClicked.connect(self.open_movie)
+    #
+    # def remove_button_objects(self):
+    #     for b in self.buttons:
+    #         del b
+    #     self.button_event()
 
     def signal_handling(self):
         for b in self.buttons:
@@ -715,15 +757,57 @@ class MainWindow(QtWidgets.QMainWindow):
 
         text = self.sender().currentText()
         print(text)
+        self.movie_list = list(self.db.database.keys())
         if text == 'Name A->Z':
-            self.add_buttons(order='asc')
+            self.movie_list.sort()
         elif text == 'Name Z->A':
-            self.add_buttons(order='desc')
+            self.movie_list.sort(reverse=True)
+        elif text == 'Rating':
+            self.movie_list = self.sort_by('vote_average')
+        elif text == 'Year':
+            self.movie_list = self.sort_by('release_date')
 
+        self.add_buttons(self.movie_list)
         self.movie_area.repaint()
         self.remove_event()
         # self.remove_button_objects()
         # self.movie_area.update()
+
+
+
+    def search_option(self):
+        print("Want to wipe out movie area")
+        query = self.search_field.text()
+        print("query i:=", query)
+        #
+        # if query=='':
+        #     self.movie_list=self.db.database.keys()
+
+        # if len(self.movie_list) == 0:
+        #     return
+
+        self.movie_list = self.db.database.keys()
+        self.movie_list = [name for name in self.movie_list if query.lower() in name.lower()]
+
+        self.remove_event()
+        for i in reversed(range(self.flow_layout.count())):
+            self.flow_layout.itemAt(i).widget().setParent(None)
+        self.add_buttons(self.movie_list)
+        self.signal_handling()
+
+    def sort_by(self, order):
+        print("sort by function", order)
+        sort_list = []
+        for movie_name, info in self.db.database.items():
+            print(movie_name, info)
+            sort_list.append((info[order], movie_name))
+
+        sort_list.sort(reverse=True)
+        temp = [movie_name for info_order, movie_name in sort_list]
+        return temp
+
+
+
 
     def open_movie(self, obj):
         movie_name = obj.objectName()
@@ -731,7 +815,6 @@ class MainWindow(QtWidgets.QMainWindow):
         os.startfile(self.db.database[movie_name]['location'])
 
     def update_movie_info(self, movie_name=None):
-
         if not movie_name:
             movie_name = self.sender().objectName()
         print('\n' + movie_name)
@@ -801,28 +884,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.actionSetting.setText(_translate("MainWindow", "Setting"))
-        self.actionAbout.setText(_translate("MainWindow", "About"))
-        self.actionAbout_2.setText(_translate("MainWindow", "About"))
+        self.actionAbout1.setText(_translate("MainWindow", "About"))
+        self.actionExit.setText(_translate("MainWindow", "Exit"))
 
-    def add_buttons(self, order=''):
 
+
+
+
+    def add_buttons(self, movie_list):
+        self.movie_list=movie_list
         # Get the names of all the movie from database json
-        movie_lst = list(self.db.database.keys())
-        # print("got here")
-        if order == '':
-            pass
-        elif order == 'asc':
-            movie_lst.sort()
-        elif order == 'desc':
-            movie_lst.sort(reverse=True)
-
         # print(movie_lst)
         #
         s = QtCore.QSize(154, 240)
 
         self.buttons = []
 
-        for movie in movie_lst:
+        for movie in self.movie_list:
             # b = QtWidgets.QLabel()
             b = QtWidgets.QToolButton()
             b.setText(movie)
@@ -843,7 +921,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.flow_layout.addWidget(b)
 
             self.buttons.append(b)
-            self.statusbar.showMessage(str(len(movie_lst)) + " movies loaded")
+            self.statusbar.showMessage(str(len(self.movie_list)) + " movies loaded")
 
 
 if __name__ == '__main__':

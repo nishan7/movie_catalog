@@ -14,11 +14,11 @@ class Network:
                'Connection': 'close'}
     BASE_PATH = 'https://api.themoviedb.org/3/'
     database = dict()
-    dir = ''
+    path = ''
 
     def __init__(self, dir):
         self.API_KEY = '695405dd49c500e659c471af7f59c9b5'
-        self.dir = dir
+        self.path = dir
 
     def search_movie(self, name):
         base_path = self.BASE_PATH + "search/movie?"
@@ -109,7 +109,7 @@ class Network:
         file_types = [".avi", ".mp4", ".mkv", ".mpeg", ".m4v"]
         lst = []
 
-        for root, dirs, files in os.walk(self.dir):
+        for root, dirs, files in os.walk(self.path):
             for file in files:
                 name, ext = os.path.splitext(file)
                 if ext in file_types:
