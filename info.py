@@ -27,7 +27,9 @@ class Ui_info(object):
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-        self.okay_button.clicked.connect()
+        self.okay_button.clicked.connect(Dialog.close)
+
+
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate

@@ -13,7 +13,8 @@
 import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QLabel, QDialog, QAction
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QLabel, QDialog, QAction, QSplashScreen
 
 import database
 
@@ -125,9 +126,10 @@ class FlowLayout(QtWidgets.QLayout):
 class MainWindow(QtWidgets.QMainWindow):
     actionAbout1: QAction
     poster_value: QLabel
-    movie_list =[]
+    movie_list = []
+    path = ''
 
-    def __init__(self, db, parent=None ):
+    def __init__(self, db, parent=None):
         super().__init__()
         self.db = db
         self.initUI(self)
@@ -143,9 +145,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # I recommend you try both cases.
         widget = QDialog(self)
         from setting import Ui_Setting
-        ui=Ui_Setting()
+        ui = Ui_Setting()
+        print(self.db.path)
         ui.path = self.db.path
         ui.setupUi(widget)
+        print(self.path)
         widget.exec_()
 
     def info_window(self):
@@ -154,12 +158,10 @@ class MainWindow(QtWidgets.QMainWindow):
         # I recommend you try both cases.
         widget = QDialog(self)
         from info import Ui_info
-        ui=Ui_info()
+        ui = Ui_info()
 
         ui.setupUi(widget)
         widget.exec_()
-
-
 
     def initUI(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -773,8 +775,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.remove_button_objects()
         # self.movie_area.update()
 
-
-
     def search_option(self):
         print("Want to wipe out movie area")
         query = self.search_field.text()
@@ -805,9 +805,6 @@ class MainWindow(QtWidgets.QMainWindow):
         sort_list.sort(reverse=True)
         temp = [movie_name for info_order, movie_name in sort_list]
         return temp
-
-
-
 
     def open_movie(self, obj):
         movie_name = obj.objectName()
@@ -887,12 +884,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actionAbout1.setText(_translate("MainWindow", "About"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
 
-
-
-
-
     def add_buttons(self, movie_list):
-        self.movie_list=movie_list
+        self.movie_list = movie_list
         # Get the names of all the movie from database json
         # print(movie_lst)
         #
@@ -926,11 +919,26 @@ class MainWindow(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     import sys
+    app = QtWidgets.QApplication(sys.argv)
+
+    # Splash Screen
+    # splash_screen = QtGui.QSplashScreen()
+    #     # splash_screen.show()
+    pixmap = QPixmap("new.png")
+    splash = QSplashScreen(pixmap)
+    splash.showMessage("Loading..")
+    app.processEvents()
+    splash.show()
+
+    for i in range(100000):
+        print(i)
+        continue
 
     db = database.Network("A:\\!Movie")
     db.start()
 
-    app = QtWidgets.QApplication(sys.argv)
+
     window = MainWindow(db)
+    splash.finish(window)
     window.show()
     sys.exit(app.exec_())

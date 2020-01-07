@@ -1,0 +1,1 @@
+pyuic5 -x ui.ui -o uiTest2.py

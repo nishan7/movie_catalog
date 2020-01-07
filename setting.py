@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Setting(object):
     path=''
-    def setupUi(self, Setting, path):
+    def setupUi(self, Setting):
         Setting.setObjectName("Setting")
         Setting.setWindowModality(QtCore.Qt.ApplicationModal)
         Setting.resize(685, 218)
@@ -35,7 +35,7 @@ class Ui_Setting(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.lineEdit = QtWidgets.QLineEdit(self.layoutWidget)
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.setText(path)
+        self.lineEdit.setText(self.path)
         self.horizontalLayout.addWidget(self.lineEdit)
         self.search_button = QtWidgets.QPushButton(self.layoutWidget)
         self.search_button.setMaximumSize(QtCore.QSize(104, 27))
@@ -43,8 +43,15 @@ class Ui_Setting(object):
         self.horizontalLayout.addWidget(self.search_button)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.search_button.clicked.connect(lambda object, Dialog: self.search_action(object, Dialog))
+
         self.retranslateUi(Setting)
         QtCore.QMetaObject.connectSlotsByName(Setting)
+
+    def search_action(self, object, Dialog):
+        # return self.lineEdit.text()
+        object.path=self.lineEdit.text()
+        Dialog.close()
 
     def retranslateUi(self, Setting):
         _translate = QtCore.QCoreApplication.translate
