@@ -135,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         # self.db = db
-        self.inital()
+        self.inital1()
         self.initUI(self)
 
         # root = tkinter.Tk()
@@ -143,7 +143,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.height = root.winfo_screenheight()
         # print(self.width, self.height);
 
-    def inital(self):
+    def inital1(self):
 
         try:
             # Check for root dir in start file
@@ -165,7 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
             exit(-1)
         else:
             with open('start', 'w') as fp:
-                fp.write(path)
+                fp.write(self.path)
 
         pixmap = QPixmap("new.png")
         splash = QSplashScreen(pixmap)
@@ -174,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow):
         splash.show()
 
         # Call the database class
-        db = database.Network(path)
+        db = database.Network(self.path)
         db.start()
         self.db = db
         print(db.database)
@@ -193,10 +193,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setupUi(widget)
         print(self.path)
         widget.exec_()
-        self.path=path
+        self.path = path
 
         if not os.path.exists(self.path):
-            self.intial()
+            os.remove('start')
+            self.inital1()
+
 
     def info_window(self):
         # If you pass a parent (self) will block the Main Window,
