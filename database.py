@@ -153,7 +153,7 @@ class Network:
             json.dump(self.database, fp, indent=2)
 
 
-a = Network("A:\!Movie")
-a.start()
+# a = Network("A:\!Movie")
+# a.start()
 # a.search_movie('The matrix')
 # info = a.movie_details(603)

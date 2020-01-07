@@ -18,6 +18,8 @@ from PyQt5.QtWidgets import QLabel, QDialog, QAction, QSplashScreen
 
 import database
 
+path = ''
+
 
 class FlowLayout(QtWidgets.QLayout):
     def __init__(self, parent=None, margin=-1, hspacing=-1, vspacing=-1):
@@ -128,10 +130,12 @@ class MainWindow(QtWidgets.QMainWindow):
     poster_value: QLabel
     movie_list = []
     path = ''
+    db: database.Network
 
-    def __init__(self, db, parent=None):
+    def __init__(self):
         super().__init__()
-        self.db = db
+        # self.db = db
+        self.inital()
         self.initUI(self)
 
         # root = tkinter.Tk()
@@ -139,18 +143,60 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.height = root.winfo_screenheight()
         # print(self.width, self.height);
 
+    def inital(self):
+
+        try:
+            # Check for root dir in start file
+            with open('start') as fp:
+                self.path = fp.read()
+                print(self.path)
+
+            if self.path=='': raise ("Invalid file name")
+        except:
+            widget = QDialog(self)
+            ui = Ui_Setting()
+            # ui.path = self.path
+            ui.setupUi(widget)
+            print(path)
+            widget.exec_()
+            self.path = path
+
+        if not os.path.exists(self.path):
+            exit(-1)
+        else:
+            with open('start', 'w') as fp:
+                fp.write(path)
+
+        pixmap = QPixmap("new.png")
+        splash = QSplashScreen(pixmap)
+        splash.showMessage("Loading...")
+        app.processEvents()
+        splash.show()
+
+        # Call the database class
+        db = database.Network(path)
+        db.start()
+        self.db = db
+        print(db.database)
+
+        # # finish the splash screen
+        splash.finish(self)
+
     def setting_window(self):
         # If you pass a parent (self) will block the Main Window,
         # and if you do not pass both will be independent,
         # I recommend you try both cases.
         widget = QDialog(self)
-        from setting import Ui_Setting
         ui = Ui_Setting()
         print(self.db.path)
         ui.path = self.db.path
         ui.setupUi(widget)
         print(self.path)
         widget.exec_()
+        self.path=path
+
+        if not os.path.exists(self.path):
+            self.intial()
 
     def info_window(self):
         # If you pass a parent (self) will block the Main Window,
@@ -917,28 +963,108 @@ class MainWindow(QtWidgets.QMainWindow):
             self.statusbar.showMessage(str(len(self.movie_list)) + " movies loaded")
 
 
+class Ui_Setting(object):
+    path = ''
+
+    def setupUi(self, Setting):
+        Setting.setObjectName("Setting")
+        Setting.setWindowModality(QtCore.Qt.ApplicationModal)
+        Setting.resize(685, 218)
+        Setting.setMaximumSize(QtCore.QSize(16777215, 16777206))
+        Setting.setSizeGripEnabled(False)
+        Setting.setModal(False)
+        self.layoutWidget = QtWidgets.QWidget(Setting)
+        self.layoutWidget.setGeometry(QtCore.QRect(30, 20, 591, 141))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.layoutWidget)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.label.setFont(font)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.lineEdit = QtWidgets.QLineEdit(self.layoutWidget)
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setText(self.path)
+        self.horizontalLayout.addWidget(self.lineEdit)
+        self.search_button = QtWidgets.QPushButton(self.layoutWidget)
+        self.search_button.setMaximumSize(QtCore.QSize(104, 27))
+        self.search_button.setObjectName("search_button")
+        self.horizontalLayout.addWidget(self.search_button)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+
+        # self.search_button.clicked.connect(lambda obj, Dialog: self.search_action(obj, Dialog))
+        self.lineEdit.returnPressed.connect(self.search_action)
+        self.lineEdit.returnPressed.connect(Setting.close)
+
+        self.search_button.clicked.connect(self.search_action)
+        self.search_button.clicked.connect(Setting.close)
+        self.retranslateUi(Setting)
+        QtCore.QMetaObject.connectSlotsByName(Setting)
+
+    def search_action(self, obj=None, Dialog=None):
+        global path
+        path = self.lineEdit.text()
+
+    def retranslateUi(self, Setting):
+        _translate = QtCore.QCoreApplication.translate
+        Setting.setWindowTitle(_translate("Setting", "Setting"))
+        self.label.setText(_translate("Setting", "Select the main folder for your movies..."))
+        self.search_button.setText(_translate("Setting", "Search"))
+
+
+# class A:
+#     path = ''
+
+
 if __name__ == '__main__':
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
+    # try:
+    #     with open('start') as fp:
+    #         path = fp.read()
+    # except:
+    #     if __name__ == "__main__":
+    #         import sys
+    #
+    #         app = QtWidgets.QApplication(sys.argv)
+    #         Setting = QtWidgets.QDialog()
+    #         ui = Ui_Setting()
+    #         ui.setupUi(Setting)
+    #         Setting.show()
+    #         a = app.exec_()
+    #         print(path)
+    #         sys.exit(a)
+
+    # print(path)
+    # path = 'A:\!Movie'
 
     # Splash Screen
-    # splash_screen = QtGui.QSplashScreen()
-    #     # splash_screen.show()
-    pixmap = QPixmap("new.png")
-    splash = QSplashScreen(pixmap)
-    splash.showMessage("Loading..")
-    app.processEvents()
-    splash.show()
+    # splash_screen = QSplashScreen()
+    # splash_screen.show()
+    # pixmap = QPixmap("new.png")
+    # splash = QSplashScreen(pixmap)
+    # splash.showMessage("Loading..")
+    # app.processEvents()
+    # splash.show()
 
-    for i in range(100000):
-        print(i)
-        continue
+    # for i in range(100000):
+    #     print(i)
+    #     continue
 
-    db = database.Network("A:\\!Movie")
-    db.start()
+    # Call the database class
+    # db = database.Network(path)
+    # db.start()
 
+    window = MainWindow()
 
-    window = MainWindow(db)
-    splash.finish(window)
+    # finish the splash screen
+    # splash.finish(window)
+
     window.show()
     sys.exit(app.exec_())

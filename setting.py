@@ -6,13 +6,15 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
+path=''
 class Ui_Setting(object):
     path=''
     def setupUi(self, Setting):
+
         Setting.setObjectName("Setting")
         Setting.setWindowModality(QtCore.Qt.ApplicationModal)
         Setting.resize(685, 218)
@@ -43,21 +45,45 @@ class Ui_Setting(object):
         self.horizontalLayout.addWidget(self.search_button)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        self.search_button.clicked.connect(lambda object, Dialog: self.search_action(object, Dialog))
 
+        # self.search_button.clicked.connect(lambda obj, Dialog: self.search_action(obj, Dialog))
+        self.lineEdit.returnPressed.connect(self.search_action)
+        self.lineEdit.returnPressed.connect(Setting.close)
+
+
+        self.search_button.clicked.connect(self.search_action)
+        self.search_button.clicked.connect(Setting.close)
         self.retranslateUi(Setting)
         QtCore.QMetaObject.connectSlotsByName(Setting)
 
-    def search_action(self, object, Dialog):
-        # return self.lineEdit.text()
+    def search_action(self, obj=None, Dialog=None):
+        # global path
         object.path=self.lineEdit.text()
-        Dialog.close()
+        print(object.path)
+
 
     def retranslateUi(self, Setting):
         _translate = QtCore.QCoreApplication.translate
         Setting.setWindowTitle(_translate("Setting", "Setting"))
         self.label.setText(_translate("Setting", "Select the main folder for your movies..."))
         self.search_button.setText(_translate("Setting", "Search"))
+
+# def inital():
+#
+#     app = QtWidgets.QApplication(sys.argv)
+#     Setting = QtWidgets.QDialog()
+#     ui = Ui_Setting()
+#     ui.setupUi(Setting)
+#     Setting.show()
+#     global path
+#     app.exec_()
+#     # path=ui.path
+#     # a.path=ui.path
+#     sys.exit(app.exec_())
+#     # return path
+
+# def close():
+#     sys.exit(app.exec_())
 
 
 if __name__ == "__main__":
@@ -67,4 +93,9 @@ if __name__ == "__main__":
     ui = Ui_Setting()
     ui.setupUi(Setting)
     Setting.show()
-    sys.exit(app.exec_())
+    a =app.exec_()
+    print(path)
+    sys.exit(a)
+
+
+
