@@ -4,6 +4,7 @@
 #
 # Created by: PyQt5 UI code generator 5.13.2
 #
+import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QLabel
@@ -660,44 +661,52 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.sort_combo_box
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.button_event()
-        # self.signal_handling()
+        # self.button_event()
+        self.signal_handling()
 
         self.update_movie_info(self.buttons[0].objectName())
 
     def button_event(self):
         for b in self.buttons:
             b.clicked.connect(self.update_movie_info)
+            b.doubleClicked.connect(self.open_movie)
 
     def remove_button_objects(self):
         for b in self.buttons:
             del b
         self.button_event()
 
-    # def signal_handling(self):
-    #     for b in self.buttons:
-    #         b.installEventFilter(self)
-    #
-    #         # print(b)
-    # def remove_event(self):
-    #     for b in self.buttons:
-    #         b.removeEventFilter(self)
-    #     self.signal_handling()
-    #
-    # def eventFilter(self, obj, event):
-    #     if event.type() == QtCore.QEvent.MouseButtonPress:
-    #         if event.button() == QtCore.Qt.LeftButton:
-    #             print(obj.objectName(), "Left click")
-    #             self.update_movie_info(movie_name=obj.objectName())
-    #
-    #         elif event.button() == QtCore.Qt.RightButton:
-    #             print(obj.objectName(), "Right click")
-    #             # self.actionRight(obj)
-    #
-    #
-    #         elif event.button() == QtCore.Qt.MiddleButton:
-    #             print(obj.objectName(), "Middle click")
-    #     return QtCore.QObject.event(obj, event)
+    def signal_handling(self):
+        for b in self.buttons:
+            b.installEventFilter(self)
+
+            # print(b)
+
+    def remove_event(self):
+        for b in self.buttons:
+            b.removeEventFilter(self)
+        self.signal_handling()
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.MouseButtonDblClick:
+            print("Double Click")
+            self.open_movie(obj)
+
+        if event.type() == QtCore.QEvent.MouseButtonPress:
+            if event.button() == QtCore.Qt.LeftButton:
+                print(obj.objectName(), "Left click")
+                self.update_movie_info(movie_name=obj.objectName())
+
+
+
+            elif event.button() == QtCore.Qt.RightButton:
+                print(obj.objectName(), "Right click")
+                # self.actionRight(obj)
+
+
+            elif event.button() == QtCore.Qt.MiddleButton:
+                print(obj.objectName(), "Middle click")
+        return QtCore.QObject.event(obj, event)
 
     def sort_option_changed(self):
         print("Want to wipe out movie area")
@@ -705,16 +714,21 @@ class MainWindow(QtWidgets.QMainWindow):
             self.flow_layout.itemAt(i).widget().setParent(None)
 
         text = self.sender().currentText()
-        # print(text)
+        print(text)
         if text == 'Name A->Z':
             self.add_buttons(order='asc')
         elif text == 'Name Z->A':
             self.add_buttons(order='desc')
 
         self.movie_area.repaint()
-        # self.remove_event()
-        self.remove_button_objects()
+        self.remove_event()
+        # self.remove_button_objects()
         # self.movie_area.update()
+
+    def open_movie(self, obj):
+        movie_name = obj.objectName()
+        print(movie_name, self.db.database[movie_name]['location'])
+        os.startfile(self.db.database[movie_name]['location'])
 
     def update_movie_info(self, movie_name=None):
 
@@ -747,9 +761,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.genre_value.setText(", ".join(genre["name"] for genre in self.db.database[movie_name]['genres']))
 
-        self.flow_layout.update()
+        # self.flow_layout.update()
         self.info_area.repaint()
-        self.info_area.update()
+        # self.info_area.update()
         # self.button_event()
 
     def retranslateUi(self, MainWindow):
