@@ -653,15 +653,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
 
-
-
-
-
-
-
-
-
-
         self.retranslateUi(MainWindow)
         # self.pushButton_3.clicked.connect(self.info_area.repaint)
         self.search_button.clicked.connect(self.sort_option_changed)
@@ -670,11 +661,43 @@ class MainWindow(QtWidgets.QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.button_event()
+        # self.signal_handling()
+
         self.update_movie_info(self.buttons[0].objectName())
 
     def button_event(self):
         for b in self.buttons:
             b.clicked.connect(self.update_movie_info)
+
+    def remove_button_objects(self):
+        for b in self.buttons:
+            del b
+        self.button_event()
+
+    # def signal_handling(self):
+    #     for b in self.buttons:
+    #         b.installEventFilter(self)
+    #
+    #         # print(b)
+    # def remove_event(self):
+    #     for b in self.buttons:
+    #         b.removeEventFilter(self)
+    #     self.signal_handling()
+    #
+    # def eventFilter(self, obj, event):
+    #     if event.type() == QtCore.QEvent.MouseButtonPress:
+    #         if event.button() == QtCore.Qt.LeftButton:
+    #             print(obj.objectName(), "Left click")
+    #             self.update_movie_info(movie_name=obj.objectName())
+    #
+    #         elif event.button() == QtCore.Qt.RightButton:
+    #             print(obj.objectName(), "Right click")
+    #             # self.actionRight(obj)
+    #
+    #
+    #         elif event.button() == QtCore.Qt.MiddleButton:
+    #             print(obj.objectName(), "Middle click")
+    #     return QtCore.QObject.event(obj, event)
 
     def sort_option_changed(self):
         print("Want to wipe out movie area")
@@ -688,13 +711,16 @@ class MainWindow(QtWidgets.QMainWindow):
         elif text == 'Name Z->A':
             self.add_buttons(order='desc')
 
-        # self.movie_area.repaint()
+        self.movie_area.repaint()
+        # self.remove_event()
+        self.remove_button_objects()
+        # self.movie_area.update()
 
     def update_movie_info(self, movie_name=None):
 
-        if  not movie_name:
+        if not movie_name:
             movie_name = self.sender().objectName()
-        print(movie_name)
+        print('\n' + movie_name)
 
         self.rating_value.setText(str(self.db.database[movie_name]['vote_average']))
         self.budget_value.setText(str(self.db.database[movie_name]['budget'] // 1000000) + 'm')
@@ -717,12 +743,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # print(self.db.database[movie_name]['genres'])
         genres_dict = self.db.database[movie_name]['genres']
         # for genre in genres_dict:
+        print('got here')
 
         self.genre_value.setText(", ".join(genre["name"] for genre in self.db.database[movie_name]['genres']))
 
+        self.flow_layout.update()
         self.info_area.repaint()
         self.info_area.update()
-        self.button_event()
+        # self.button_event()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -766,7 +794,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Get the names of all the movie from database json
         movie_lst = list(self.db.database.keys())
-        print("got here")
+        # print("got here")
         if order == '':
             pass
         elif order == 'asc':
@@ -774,7 +802,7 @@ class MainWindow(QtWidgets.QMainWindow):
         elif order == 'desc':
             movie_lst.sort(reverse=True)
 
-        print(movie_lst)
+        # print(movie_lst)
         #
         s = QtCore.QSize(154, 240)
 
@@ -796,11 +824,10 @@ class MainWindow(QtWidgets.QMainWindow):
             b.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
             # b.setCheckable(True)
 
-
-
             b.setFixedSize(s)
 
             self.flow_layout.addWidget(b)
+
             self.buttons.append(b)
             self.statusbar.showMessage(str(len(movie_lst)) + " movies loaded")
 
